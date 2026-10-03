@@ -3,29 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bun + TS Template</title>
+  <title>Eka; guess the year from the periodic table</title>
+  <meta name="description" content="A guessing game about the periodic table: read the elements known at a hidden moment and work out the year." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦊</text></svg>">
   <style>
     :root {
       --bg: #0d0d0d;
       --surface: #1a1a1a;
+      --surface-2: #262626;
       --text: #e0e0e0;
-      --muted: #888;
+      --muted: #8a8a8a;
       --accent: #f0a040;
+      --border: #2a2a2a;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      padding: 24px 16px 40px;
     }
-    #root {
-      text-align: center;
+    .app { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
+    .masthead { text-align: center; }
+    h1 {
+      font-size: 2.4rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-right: -0.24em;
     }
+    .tagline { color: var(--muted); font-size: 0.95rem; margin-top: 4px; }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .clue { font-size: 1.05rem; line-height: 1.5; }
+    .clue strong { color: var(--accent); }
+    .table { width: 100%; height: auto; display: block; }
+    .legend {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .legend li { display: flex; align-items: center; gap: 5px; }
+    .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .slider-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .slider-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .year-readout {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .range { width: 100%; accent-color: var(--accent); }
+    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .year-input {
+      width: 96px;
+      background: #0f0f0f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 9px 10px;
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .guess-button {
+      background: var(--accent);
+      color: #141414;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .guess-button:disabled { opacity: 0.5; cursor: default; }
+    .ghost-button {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .guesses-left { margin-left: auto; color: var(--muted); font-size: 0.8rem; }
+    .feedback { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+    .feedback li { display: flex; gap: 10px; }
+    .feedback-year { color: var(--accent); font-variant-numeric: tabular-nums; min-width: 52px; }
+    .feedback-text { color: var(--muted); }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .reveal-year {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .score-max { font-size: 1.3rem; color: var(--muted); font-weight: 500; }
+    .reveal-headline { font-size: 1.25rem; }
+    .reveal-line, .reveal-fact { line-height: 1.55; }
+    .reveal-fact { color: #cfcfcf; }
+    .reveal-sub {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.85rem; }
+    .chips li { background: var(--surface-2); border-radius: 999px; padding: 4px 10px; }
+    .chip-year { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .reveal-score { color: var(--muted); font-size: 0.9rem; }
+    .results { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .results th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .results td { padding: 5px 6px; border-bottom: 1px solid #202020; }
+    .results-year { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .summary-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .howto, .footer p { color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+    .footer {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    a { color: var(--accent); }
   </style>
 </head>
 <body>
