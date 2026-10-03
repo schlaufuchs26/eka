@@ -21,7 +21,7 @@ export const PUZZLES: readonly Puzzle[] = [
   {
     year: 1669,
     headline: "The first named discoverer",
-    fact: "Hennig Brand, chasing gold out of urine, boiled down thousands of litres of it and got a waxy substance that glowed in the dark: phosphorus. Eleven elements were known, and Brand was the first person we can name as the discoverer of one.",
+    fact: "Hennig Brand, chasing gold out of urine, boiled down thousands of litres of it and got a waxy substance that glowed in the dark: phosphorus. It was the twelfth element on the list, and Brand was the first person we can name as the discoverer of one.",
   },
   {
     year: 1750,
@@ -56,7 +56,7 @@ export const PUZZLES: readonly Puzzle[] = [
   {
     year: 1839,
     headline: "The rare earths begin",
-    fact: "Carl Gustaf Mosander pulled lanthanum out of cerium nitrate, six years after cerium itself had been separated. The rare earths turned into a tangle that took a century to sort out.",
+    fact: "Carl Gustaf Mosander pulled lanthanum out of cerium nitrate, thirty-six years after cerium itself had been separated. The rare earths turned into a tangle that took a century to sort out.",
   },
   {
     year: 1860,
